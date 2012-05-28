@@ -7,6 +7,6 @@ package jp.ac.aiit.apbl6.rtconv.model
  * Time: 23:09
  * To change this template use File | Settings | File Templates.
  */
-
-abstract class JavaBodyModel(var name: String) {
+trait JavaBodyModel {
+  val name: String
 }

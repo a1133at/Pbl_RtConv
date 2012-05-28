@@ -8,5 +8,5 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 
-case class JavaModel(var packageName: String, var imports: List[ImportModel], var body: JavaBodyModel) {
+case class JavaModel(val packageName: String, val imports: Array[ImportModel], var body: JavaBodyModel) {
 }
