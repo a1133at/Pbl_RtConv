@@ -12,6 +12,6 @@ case class ClassModel(val name: String,
                  val modifiers: Array[ModifierModel],
                  val Interfaces: Array[InterfaceModel],
                  val members: Array[IMemberModel]
-                  ) {
+                  ) extends JavaBodyModel{
 
 }
