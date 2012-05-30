@@ -10,7 +10,7 @@ import com.sun.xml.internal.fastinfoset.algorithm.BooleanEncodingAlgorithm
  * To change this template use File | Settings | File Templates.
  */
 
-class FieldModel(val name: String,
+case class FieldModel(val name: String,
                  val isStatic: Boolean,
                  val modifiers: Array[ModifierModel],
                  val type_m: TypeModel)  extends IMemberModel {

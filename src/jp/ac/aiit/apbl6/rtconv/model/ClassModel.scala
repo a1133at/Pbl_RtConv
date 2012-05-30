@@ -8,7 +8,7 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 
-class ClassModel(val name: String,
+case class ClassModel(val name: String,
                  val modifiers: Array[ModifierModel],
                  val Interfaces: Array[InterfaceModel],
                  val members: Array[IMemberModel]

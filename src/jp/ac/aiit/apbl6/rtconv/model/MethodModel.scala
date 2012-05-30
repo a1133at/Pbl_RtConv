@@ -8,7 +8,7 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 
-class MethodModel(val name: String,
+case class MethodModel(val name: String,
                   val isStatic: Boolean,
                   val modifiers: Array[ModifierModel],
                   val type_m: TypeModel,
