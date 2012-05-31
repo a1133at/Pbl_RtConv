@@ -13,4 +13,8 @@ trait IMemberModel {
   val modifiers: Array[ModifierModel]
   val isStatic: Boolean
   val name: String
+
+  def isMethod = {
+    this.isInstanceOf[MethodModel]
+  }
 }

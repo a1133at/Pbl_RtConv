@@ -9,4 +9,8 @@ package jp.ac.aiit.apbl6.rtconv.model
  */
 trait JavaBodyModel {
   val name: String
+
+  def isMethod = {
+    this.isInstanceOf[InterfaceModel]
+  }
 }
