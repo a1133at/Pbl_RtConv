@@ -8,11 +8,11 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 object ModifierModel {
-  val ABSTRACT = ModifierModel("ABSTRACT")
-  val PUBLIC = ModifierModel("PUBLIC")
-  val PROTECTED = ModifierModel("PROTECTED")
-  val PRIVATE = ModifierModel("PRIVATE")
-  val STATIC = ModifierModel("STATIC")
+  val ABSTRACT = new ModifierModel("abstract")
+  val PUBLIC = new ModifierModel("public")
+  val PROTECTED = new ModifierModel("protected")
+  val PRIVATE = new ModifierModel("private")
+  val STATIC = new ModifierModel("static")
 }
 
 class ModifierModel private (val name: String) {
