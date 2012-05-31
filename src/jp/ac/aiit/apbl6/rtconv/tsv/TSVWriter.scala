@@ -2,6 +2,7 @@ package jp.ac.aiit.apbl6.rtconv.tsv
 
 import jp.ac.aiit.apbl6.rtconv.model
 import model._
+import java.io.{FileOutputStream, OutputStreamWriter}
 
 /**
  * Created with IntelliJ IDEA.
@@ -12,29 +13,36 @@ import model._
  */
 
 object TSVWriter {
-  def write(models: Array[JavaModel]): Unit = {
-    val strList = getStrList(models.toList)
+
+
+  def write(models: Array[JavaModel], filePath: String): Unit = {
+    val writer = new OutputStreamWriter(new FileOutputStream(filePath, false),"UTF-8")
+    getStrList(models.toList).foreach(line => writer.write(line + "\r\n"))
+    writer.close()
   }
 
   private def getStrList(models: List[JavaModel]): List[String] = {
+    //(PackageName,PackageId)
     val packageMap = getPackageMap(models)
-    val packageStrList = packageMap.map(p => "PACKAGE\t%s\t%s".format(p._2,p._1)).toList
-    val bodyStrList = getStrListBody(models, packageMap)
-    packageStrList++bodyStrList
-  }
+    //(JavaBodyModel,PackageId,BodyId)
+    val bodyIdMap = models.map(m => (m.body, packageMap(m.packageName))).zipWithIndex.map(t => (t._1._1, t._1._2, t._2))
 
+    val packageStrList = packageMap.map(p => "PACKAGE\t%s\t%s".format(p._2,p._1)).toList
+    val bodyStrList = getStrListBody(bodyIdMap)
+    var relationStrList = getStrListRelation(bodyIdMap)
+    packageStrList++bodyStrList++relationStrList
+  }
 
   /**
    * create String List for Body of tsv
-   * @param models
-   * @return
    */
-  private def getStrListBody(models: List[JavaModel], packMap: Map[String, Int]) :List[String] = {
-    List[String]()++models.map(m => (m.body, packMap(m.packageName)))
-                          .zipWithIndex.flatMap({case t:((ClassModel,Int), Int) => toStrListClass(t._1._1, t._2, t._1._2)
-                                                 case t:((InterfaceModel, Int), Int) => toStrListInf(t._1._1, t._2, t._1._2)
-                                                 case _ => List[String]()})
+  private def getStrListBody(bodyIdMap: List[(JavaBodyModel, Int, Int)]): List[String] = {
+    List[String]()++bodyIdMap.flatMap({case t:(ClassModel,Int, Int) => toStrListClass(t._1, t._3, t._2)
+                                       case t:(InterfaceModel, Int, Int) => toStrListInf(t._1, t._3, t._2)
+                                       case _ => List[String]()})
   }
+ // private def getBodyIdMap(models: List[JavaModel], packMap: Map[String, Int]): List[(JavaBodyModel, Int, Int)] = {null}
+
 
   private def toStrListClass(m: ClassModel, cId: Int, pId :Int): List[String] = {
     val classFormat = "%s\t%s\t%s\t%s\t0\t0\t0\t0\t0\t\t%s"
@@ -60,9 +68,9 @@ object TSVWriter {
       model.parameters.map(p => "PARAMETER\t%s\t%s".format(p._1,p._2.name))
   }
 
-  private def isAbstract(modifiers: List[ModifierModel]) : Boolean = modifiers.contains(ModifierModel.ABSTRACT)
+  private def isAbstract(modifiers: List[ModifierModel]): Boolean = modifiers.contains(ModifierModel.ABSTRACT)
 
-  private def getVisibility(modifiers: List[ModifierModel]) : String = {
+  private def getVisibility(modifiers: List[ModifierModel]): String = {
     modifiers match {
       case m if m.contains(ModifierModel.PUBLIC) => ModifierModel.PUBLIC.name
       case m if m.contains(ModifierModel.PRIVATE) => ModifierModel.PRIVATE.name
@@ -71,17 +79,21 @@ object TSVWriter {
     }
   }
 
+  private def getStrListRelation(bodyIdMap: List[(JavaBodyModel, Int, Int)]): List[String] = {
+  List()
+  }
+
   /**
    * Create Map for Package Part of tsv
    * @param models
    * @return
    */
-  private def getPackageMap(models: List[JavaModel]):Map[String,Int] =
+  private def getPackageMap(models: List[JavaModel]): Map[String,Int] =
     Map()++models.map(model => model.packageName).distinct.zipWithIndex
 
   /*
   def getPackageMap(models: List[JavaModel]):Map[String,Int] = {
-    val i = 0
+    var i = 0
     //Worker Function
     def updateMap(a: Array[JavaModel], m: Map[String, Int]): Map[String,Int] = {
       if(a.isEmpty){
