@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<XMLData xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <AkiguchiPBL>
+    <Members>
+#foreach ( $member in $members )
+      <Member>
+        <Name>$member</Name>
+#*
+        <Occupation>$member.occupation</Occupation>
+        <FavoriteLessons>
+#*  *# #foreach ( $favoriteLesson in $member.favoriteLessons )
+         <FavoriteLesson>$favoriteLesson</FavoriteLesson>
+#*  *# #end
+       </FavoriteLessons>
+#end
+*#
+    </Members>
+  </AkiguchiPBL>
+</XMLData>
