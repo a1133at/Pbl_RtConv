@@ -1,3 +1,70 @@
+package $packageName;
+#foreach ( $import in $imports )
+import $import;
+#end
+
+#if ( body.isClass() )  #* case of Interface  *#
+interface body.name {
+#foreach( $member in $members)
+    #if ( $member.isMethod() )  #* case of Method  *#                                                          #* パラメータ残し！ *#
+        #foreach( $modifier in $member.modifiers) $modifier.name   #end #if ( isStatic ) static #end type_m.name $member.name() {
+        }
+    #else                       #* case of Field   *#
+
+    #end
+#end
+
+    private Template template 		= null;
+    private VelocityContext context	= new VelocityContext();
+    private VelocityEngine engine	= new VelocityEngine();
+
+	public VelocityWrapper(String templateFileName) throws IOException,Exception{
+
+        Properties props		= new Properties();
+
+		engine.setProperty(VelocityEngine.RUNTIME_LOG_LOGSYSTEM_CLASS, "org.apache.velocity.runtime.log.NullLogSystem");
+        engine.init(props);
+
+        template			= engine.getTemplate(templateFileName);
+    }
+
+	/**
+	 *
+	 * @param key
+	 * @param value
+	 */
+	public void put(String key, Object value) {
+		context.put(key, value);
+	}
+
+	/**
+	 * @return
+	 * @throws ResourceNotFoundException
+	 * @throws ParseErrorException
+	 * @throws MethodInvocationException
+	 * @throws Exception
+	 */
+	public String merge()
+		throws ResourceNotFoundException,ParseErrorException,MethodInvocationException,Exception{
+		StringWriter sw		= new StringWriter();
+		template.merge(context, sw);
+		return sw.toString();
+	}
+}
+
+#else  #* case of Class  *#
+#foreach ($modifier in body.modifiers) $modifier  #end class body.name {
+
+
+}
+#end
+
+
+
+
+
+
+
 <?xml version="1.0" encoding="utf-8"?>
 <XMLData xmlns="" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <AkiguchiPBL>
