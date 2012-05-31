@@ -8,10 +8,10 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 
-class ClassModel(var name: String,
-                 var modifiers: List[ModifierModel],
-                 var Interfaces: List[InterfaceModel],
-                 var members: List[IMemberModel]
-                  ) extends JavaBodyModel(name) {
+case class ClassModel(val name: String,
+                 val modifiers: Array[ModifierModel],
+                 val Interfaces: Array[InterfaceModel],
+                 val members: Array[IMemberModel]
+                  ) extends JavaBodyModel{
 
 }

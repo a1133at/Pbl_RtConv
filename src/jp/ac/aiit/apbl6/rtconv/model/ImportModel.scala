@@ -8,6 +8,6 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 
-class ImportModel(var name: String) {
+case class ImportModel(val name: String) {
 
 }

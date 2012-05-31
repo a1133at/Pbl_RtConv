@@ -7,6 +7,10 @@ package jp.ac.aiit.apbl6.rtconv.model
  * Time: 23:09
  * To change this template use File | Settings | File Templates.
  */
+trait JavaBodyModel {
+  val name: String
 
-abstract class JavaBodyModel(var name: String) {
+  def isMethod = {
+    this.isInstanceOf[InterfaceModel]
+  }
 }

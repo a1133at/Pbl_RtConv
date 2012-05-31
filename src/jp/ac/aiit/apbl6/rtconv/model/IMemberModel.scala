@@ -9,8 +9,12 @@ package jp.ac.aiit.apbl6.rtconv.model
  */
 
 trait IMemberModel {
-  var type_m: TypeModel
-  var modifiers: List[ModifierModel]
-  var isStatic: Boolean
-  var name: String
+  val type_m: TypeModel
+  val modifiers: Array[ModifierModel]
+  val isStatic: Boolean
+  val name: String
+
+  def isMethod = {
+    this.isInstanceOf[MethodModel]
+  }
 }
