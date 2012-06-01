@@ -1,5 +1,7 @@
 package jp.ac.aiit.apbl6.rtconv.model
 
+import reflect.BeanProperty
+
 /**
  * Created with IntelliJ IDEA.
  * User: ATakahashi
@@ -9,10 +11,10 @@ package jp.ac.aiit.apbl6.rtconv.model
  */
 
 trait IMemberModel {
-  val type_m: TypeModel
-  val modifiers: Array[ModifierModel]
-  val isStatic: Boolean
-  val name: String
+  @BeanProperty val type_m: TypeModel
+  @BeanProperty val modifiers: Array[ModifierModel]
+  @BeanProperty val isStatic: Boolean
+  @BeanProperty val name: String
 
   def isMethod = {
     this.isInstanceOf[MethodModel]

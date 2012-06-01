@@ -1,5 +1,7 @@
 package jp.ac.aiit.apbl6.rtconv.model
 
+import reflect.BeanProperty
+
 /**
  * Created with IntelliJ IDEA.
  * User: ATakahashi
@@ -8,10 +10,10 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 
-case class ClassModel(val name: String,
-                 val modifiers: Array[ModifierModel],
-                 val Interfaces: Array[InterfaceModel],
-                 val members: Array[IMemberModel]
+case class ClassModel(@BeanProperty name: String,
+                      @BeanProperty val modifiers: Array[ModifierModel],
+                      @BeanProperty val Interfaces: Array[InterfaceModel],
+                      @BeanProperty val members: Array[IMemberModel]
                   ) extends JavaBodyModel{
 
 }
