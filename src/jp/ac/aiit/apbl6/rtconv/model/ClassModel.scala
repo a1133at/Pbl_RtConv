@@ -14,7 +14,6 @@ case class ClassModel(@BeanProperty name: String,
                       @BeanProperty val modifiers: Array[ModifierModel],
                       @BeanProperty val Interfaces: Array[InterfaceModel],
                       @BeanProperty val members: Array[IMemberModel]
-                       ) extends JavaBodyModel{
+                  ) extends JavaBodyModel{
 
 }
-

@@ -11,5 +11,13 @@ project/plugins/project/
 
 # Scala-IDE specific
 .scala_dependencies
+<<<<<<< HEAD
+
+.idea/*
+output.xml
+
+Pbl_RtConv.iml
+=======
 .idea/
 *.iml
+>>>>>>> 189288ca1cbc4053fef930dd8c96d3d64fd58518
