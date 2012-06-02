@@ -10,9 +10,10 @@ import reflect.BeanProperty
  * To change this template use File | Settings | File Templates.
  */
 
-case class ClassModel(@BeanProperty name: String,
+case class ClassModel(@BeanProperty val name: String,
                       @BeanProperty val modifiers: Array[ModifierModel],
                       @BeanProperty val Interfaces: Array[InterfaceModel],
+                      @BeanProperty val extendsClass: ClassModel,
                       @BeanProperty val members: Array[IMemberModel]
                   ) extends JavaBodyModel{
 
