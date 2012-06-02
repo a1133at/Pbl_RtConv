@@ -1,5 +1,7 @@
 package jp.ac.aiit.apbl6.rtconv.model
 
+import reflect.BeanProperty
+
 /**
  * Created with IntelliJ IDEA.
  * User: ATakahashi
@@ -8,10 +10,10 @@ package jp.ac.aiit.apbl6.rtconv.model
  * To change this template use File | Settings | File Templates.
  */
 
-case class MethodModel(val name: String,
-                  val isStatic: Boolean,
-                  val modifiers: Array[ModifierModel],
-                  val type_m: TypeModel,
-                  var parameters: Map[String, TypeModel])
+case class MethodModel(@BeanProperty val name: String,
+                       @BeanProperty val isStatic: Boolean,
+                       @BeanProperty val modifiers: Array[ModifierModel],
+                       @BeanProperty val type_m: TypeModel,
+                       @BeanProperty var parameters: Map[String, TypeModel])
   extends IMemberModel {
 }

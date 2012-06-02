@@ -1,5 +1,7 @@
 package jp.ac.aiit.apbl6.rtconv.model
 
+import reflect.BeanProperty
+
 /**
  * Created with IntelliJ IDEA.
  * User: ATakahashi
@@ -15,5 +17,5 @@ object ModifierModel {
   val STATIC = new ModifierModel("static")
 }
 
-class ModifierModel private (val name: String) {
+class ModifierModel private (@BeanProperty val name: String) {
 }

@@ -1,6 +1,6 @@
 package jp.ac.aiit.apbl6.rtconv.model
 
-import com.sun.xml.internal.fastinfoset.algorithm.BooleanEncodingAlgorithm
+import reflect.BeanProperty
 
 /**
  * Created with IntelliJ IDEA.
@@ -10,8 +10,8 @@ import com.sun.xml.internal.fastinfoset.algorithm.BooleanEncodingAlgorithm
  * To change this template use File | Settings | File Templates.
  */
 
-case class FieldModel(val name: String,
-                 val isStatic: Boolean,
-                 val modifiers: Array[ModifierModel],
-                 val type_m: TypeModel)  extends IMemberModel {
+case class FieldModel(@BeanProperty val name: String,
+                      @BeanProperty val isStatic: Boolean,
+                      @BeanProperty val modifiers: Array[ModifierModel],
+                      @BeanProperty val type_m: TypeModel)  extends IMemberModel {
 }
