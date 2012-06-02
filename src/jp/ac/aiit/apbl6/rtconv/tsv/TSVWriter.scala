@@ -80,7 +80,7 @@ object TSVWriter {
   }
 
   private def getStrListRelation(bodyIdMap: List[(JavaBodyModel, Int, Int)]): List[String] = {
-  List()
+    List()
   }
 
   /**
@@ -89,24 +89,5 @@ object TSVWriter {
    * @return
    */
   private def getPackageMap(models: List[JavaModel]): Map[String,Int] =
-    Map()++models.map(model => model.packageName).distinct.zipWithIndex
-
-  /*
-  def getPackageMap(models: List[JavaModel]):Map[String,Int] = {
-    var i = 0
-    //Worker Function
-    def updateMap(a: Array[JavaModel], m: Map[String, Int]): Map[String,Int] = {
-      if(a.isEmpty){
-        m
-      } else {
-        if (!m.contains(a(0).packageName)){
-          i += 1
-          updateMap(a - a(0), m + (a(0).packageName -> i))
-        } else {
-          updateMap(a - a(0), m)
-        }
-      }
-    }
-    updateMap(models,Map.empty[String,Int])
-  }*/
+    Map()++models.map(model => model.packageName).distinct.zipWithIndex.map(m => (m._1, m._2 + 1))
 }

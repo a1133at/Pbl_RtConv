@@ -10,7 +10,8 @@ package jp.ac.aiit.apbl6.rtconv.model
 
 case class ClassModel(val name: String,
                  val modifiers: Array[ModifierModel],
-                 val Interfaces: Array[InterfaceModel],
+                 val interfaces: Array[InterfaceModel],
+                 val extendsClass: Array[ClassModel],
                  val members: Array[IMemberModel]
                   ) extends JavaBodyModel{
 
