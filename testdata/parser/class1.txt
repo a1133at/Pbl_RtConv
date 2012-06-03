@@ -1,0 +1,17 @@
+package test;
+import java.io;
+public class class1 extends class2 implements interface1,interface2 {
+    static{
+    }
+    public class1(){
+    }
+
+    public static int field1;
+    private String field2;
+    final public double field3;
+
+    public static void method1(int i, double d){
+    }
+    private int method2(){
+    }
+}
