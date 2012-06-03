@@ -12,7 +12,7 @@ import reflect.BeanProperty
 trait JavaBodyModel {
   @BeanProperty val name: String
 
-  def isMethod = {
+  def isClass = {
     this.isInstanceOf[InterfaceModel]
   }
 }
