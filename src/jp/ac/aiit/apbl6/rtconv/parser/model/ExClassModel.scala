@@ -13,8 +13,10 @@ import jp.ac.aiit.apbl6.rtconv.model._
 class ExClassModel(name: String,
                    modifiers: Array[ModifierModel],
                    interfaces: Array[InterfaceModel],
+                   extendClass: ClassModel,
                    members: Array[IMemberModel],
                    val exClassName : List[String],
-                   val exInterfaces: List[String]) extends ClassModel(name,modifiers,interfaces,members){
+                   val exInterfaces: List[String])
+  extends ClassModel(name,modifiers,interfaces,extendClass,members){
 
 }
