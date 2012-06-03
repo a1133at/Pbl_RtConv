@@ -189,7 +189,7 @@ class JavaCodeParser extends JavaTokenParsers  {
     case fieldModifier~myType~variableDeclarator~";" => {
       new FieldModel(
         variableDeclarator,
-        fieldModifier.exists( elm => (elm.name == "static") ),
+        fieldModifier.exists( elm => if (elm != null) elm.name == "static" else false ),
         fieldModifier.toArray,
         myType)
     }
