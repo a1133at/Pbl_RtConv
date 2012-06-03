@@ -1,0 +1,6 @@
+    #foreach($member in $javaModel.body.members )
+    #if($member.isMethod())
+
+    #else
+#*    *# #foreach( $modifier in $member.modifiers) $modifier.name#end $member.type_m.name $member.name;#end
+    #end
