@@ -20,17 +20,37 @@ object GeneratorMain {
     println("program start")
 
     // making test data
-//    val import1 = new ImportModel("java.io.PrintWriter1")
-//    val import2 = new ImportModel("java.io.PrintWriter2")
-    val import1 = new ImportModel(" java.io.PrintWriter1")
-    val import2 = new ImportModel("java.io.PrintWriter2")
+    var javaModel = new JavaModel(
+        "jp.co.hogehuga.implementation",
+        Array(new ImportModel("java.io.PrintWriter1"), new ImportModel("java.io.PrintWriter2")),
+        new InterfaceModel("IConstants",  Array(
+          new FieldModel("iIndex",   false, Array(ModifierModel.PUBLIC,  ModifierModel.STATIC), new TypeModel("int")),
+          new FieldModel("strField", false, Array(ModifierModel.PRIVATE, ModifierModel.STATIC), new TypeModel("String"))
+        )
+        )
+      )
 
-    val javaModel = new JavaModel(
-      "jp.co.hogehuga.implementation",
-      Array(import1, import2),
-      new InterfaceModel("testInterface", Array(new FieldModel("testField", false, Array(ModifierModel.PUBLIC), new TypeModel("int"))))
-    )
-
+    if (false){
+        javaModel = new JavaModel(
+          "jp.co.hogehuga.implementation",
+          Array(new ImportModel("java.io.PrintWriter1"), new ImportModel("java.io.PrintWriter2")),
+            new ClassModel(  "CMetaData",
+                              Array(ModifierModel.PUBLIC),
+                              Array(
+                                   new InterfaceModel("IConstants",
+                                     Array(
+                                         new FieldModel("iIndex",   false, Array(ModifierModel.PUBLIC,  ModifierModel.STATIC), new TypeModel("int")),
+                                         new FieldModel("strField", false, Array(ModifierModel.PRIVATE, ModifierModel.STATIC), new TypeModel("String"))
+                                     )
+                                   )
+                               ),
+                              null,
+                              Array(
+                                   new FieldModel("iIndex",   false, Array(ModifierModel.PUBLIC,  ModifierModel.STATIC), new TypeModel("int"))
+                               )
+          )
+        )
+    }
     // use Velocity
     val velWrapper = new VelocityWrapper(File.separator + "template" + File.separator + "templateJava.vm")
     velWrapper.put("javaModel", javaModel)

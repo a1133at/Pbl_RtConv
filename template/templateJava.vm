@@ -1,16 +1,19 @@
+## package
 package $javaModel.packageName;
 
+## import
 #foreach ( $import in $javaModel.imports )
-import $import
+import $import.name;
 #end
 
-$javaBody = $javaModel.body
-#if ( $javaBody.isClass)   #* case of Class  *#
-#else                      #* case of Interface  *#
-#foreach( $modifier in $javaBody.modifiers ) $modifier  #end interface $javaBody.name { }
-#end
+#if ( $javaModel.body.isClass())    #* class or interface *#
+## case of Class
+#foreach($modifier in $javaModel.body.modifiers)$modifier.name#end class $javaModel.body.name
+#else
+## case of Interface
+interface $javaModel.body.name {
+    #foreach($member in $javaModel.body.members )#foreach( $modifier in $member.modifiers)$modifier.name#end $member.type_m.name $member.name;
+    #end
 
-package $packageName;
-#foreach ( $import in $imports )
-import $import;
+}
 #end
