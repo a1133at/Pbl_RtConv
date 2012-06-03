@@ -13,6 +13,6 @@ trait JavaBodyModel {
   @BeanProperty val name: String
 
   def isClass = {
-    this.isInstanceOf[InterfaceModel]
+    this.isInstanceOf[ClassModel]
   }
 }

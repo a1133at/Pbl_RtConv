@@ -12,9 +12,13 @@ import reflect.BeanProperty
 
 case class ClassModel(@BeanProperty val name: String,
                       @BeanProperty val modifiers: Array[ModifierModel],
-                      @BeanProperty val Interfaces: Array[InterfaceModel],
+                      @BeanProperty val interfaces: Array[InterfaceModel],
                       @BeanProperty val extendsClass: ClassModel,
                       @BeanProperty val members: Array[IMemberModel]
                   ) extends JavaBodyModel{
 
+//    def isModifiers():    Boolean = if ((modifiers == null)  || (modifiers.length == 0)) false else true
+    def isModifiers():    Boolean = if ((modifiers == null)  || (modifiers.length == 0)) false else true
+    def isInterfaces():   Boolean = if ((interfaces == null) || (interfaces.length == 0)) false else true
+    def isExtendsClass(): Boolean = if (extendsClass == null) false else true
 }

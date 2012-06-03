@@ -30,12 +30,12 @@ object GeneratorMain {
         )
       )
 
-    if (false){
+    if (true){
         javaModel = new JavaModel(
           "jp.co.hogehuga.implementation",
           Array(new ImportModel("java.io.PrintWriter1"), new ImportModel("java.io.PrintWriter2")),
             new ClassModel(  "CMetaData",
-                              Array(ModifierModel.PUBLIC),
+                              Array(ModifierModel.PUBLIC, ModifierModel.STATIC),
                               Array(
                                    new InterfaceModel("IConstants",
                                      Array(
@@ -56,7 +56,7 @@ object GeneratorMain {
     velWrapper.put("javaModel", javaModel)
     val result = velWrapper.merge()
     System.out.println("expand test data")
-    val pw	= new PrintWriter("output.xml", "UTF-8")
+    val pw	= new PrintWriter("output.txt", "UTF-8")
     pw.print(result)
     System.out.println("output the data")
     pw.close()
