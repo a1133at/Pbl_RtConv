@@ -46,7 +46,8 @@ object GeneratorMain {
                                ),
                               null,
                               Array(
-                                   new FieldModel("iIndex",   false, Array(ModifierModel.PUBLIC,  ModifierModel.STATIC), new TypeModel("int"))
+                                   new FieldModel("iIndex",  false, Array(ModifierModel.PUBLIC,  ModifierModel.STATIC), new TypeModel("int")),
+                                   new MethodModel("createObject", false, Array(ModifierModel.PUBLIC,  ModifierModel.STATIC), new TypeModel("Object"), Map("dbVariant"-> "double", "iVal" -> "int"))
                                )
           )
         )

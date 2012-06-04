@@ -1,6 +1,9 @@
-    #foreach($member in $javaModel.body.members )
-    #if($member.isMethod())
-
-    #else
-#*    *# #foreach( $modifier in $member.modifiers) $modifier.name#end $member.type_m.name $member.name;#end
-    #end
+## template of member (method or field)
+#*    *# #foreach($member in $javaModel.body.members )
+#*        *# #if($member.isMethod())
+#*            *# #foreach( $modifier in $member.modifiers) $modifier.name#end $member.type_m.name $member.name()(#foreach($parameter in $member.getParametersAsArray()) #set($params = "$parameter.toString()") $params.substring(1, $params.indexOf( "," ))  #set ($temp1 = $params.indexOf( ',' )) #set ($start = $temp1 + 1) $params.substring($start, $params.lastIndexOf( ')' )),#end ) {
+              }
+#*        *# #else
+#*            *# #foreach( $modifier in $member.modifiers) $modifier.name#end $member.type_m.name $member.name;
+#*        *# #end
+#*    *# #end
