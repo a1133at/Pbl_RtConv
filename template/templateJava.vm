@@ -7,19 +7,16 @@ import $import.name;
 #end
 
 #if ( $javaModel.body.isClass())
-#* *# ## case of Class
-#* *# #if($javaModel.body.isModifiers())
-#*       *# #foreach($modifier in $javaModel.body.modifiers) $modifier.name#end
-#* *# #end
-#* *# class $javaModel.body.name
-#* *# #if($javaModel.body.isExtendsClass()) extends $javaModel.body.extendsClass#end
-#* *# #if($javaModel.body.isInterfaces()) implements #foreach($interface in $javaModel.body.interfaces) $interface.name#end
-#* *# #end {
+## case of Class
+#if($javaModel.body.isModifiers())
+#foreach($modifier in $javaModel.body.modifiers)$modifier.name #end
+#end
+class $javaModel.body.name#if($javaModel.body.isExtendsClass()) extends $javaModel.body.extendsClass.name#end #if($javaModel.body.isInterfaces())implements #foreach($interface in $javaModel.body.interfaces)$interface.name#end
+#* *# #end{
     #parse("template/member.vm")
-}
 #else
 ## case of Interface
 interface $javaModel.body.name {
     #parse("template/member.vm")
-}
 #end
+}
