@@ -80,7 +80,17 @@ object TSVWriter {
   }
 
   private def getStrListRelation(bodyIdMap: List[(JavaBodyModel, Int, Int)]): List[String] = {
-    List()
+    val classList = bodyIdMap.filter( p => ( p._1.isInstanceOf[ClassModel] ) )
+    val exList = classList.filter( p => ( null != p._1.asInstanceOf[ClassModel].extendsClass )  )
+    var IdMap = Map[Int,Int]()
+    for( elm <- exList ){
+      val obj = classList.find( _._1.name == elm._1.name )
+      if (obj != None){
+        IdMap = IdMap + (elm._2 -> obj.get._2)
+      }
+    }
+    val exFormat = "EXTEND\t%d\t%d\tnull\tnull\tnull\tfalse\ttrue\tnull\tnull\tSTRAIGHT_LINE\tnull\tfalse"
+    List() ++ IdMap.map( p => exFormat.format( p._1, p._2 ) )
   }
 
   /**
