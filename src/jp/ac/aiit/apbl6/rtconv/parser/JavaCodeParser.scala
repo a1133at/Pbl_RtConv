@@ -123,7 +123,8 @@ class JavaCodeParser extends JavaTokenParsers  {
         variableDeclarator,
         constantModifiers.exists( elm => (elm.name == "static") ),
         constantModifiers.toArray,
-        myType)
+        myType.name
+      )
     }
   }
 
@@ -139,7 +140,7 @@ class JavaCodeParser extends JavaTokenParsers  {
           methodDeclarator._1,
           abstractMethodModifier.exists( e => e.name == "static" ),
           abstractMethodModifier.toArray,
-          resultType,
+          resultType.name,
           methodDeclarator._2.map( p => new Pair(p._1, p._2.name) ))
       }
     }
@@ -203,7 +204,7 @@ class JavaCodeParser extends JavaTokenParsers  {
       "",
       true,
       ( Array():Array[ModifierModel] ),
-      new TypeModel(""),
+      "",
       (Map():Map[String,String])
     )
   }
@@ -218,7 +219,7 @@ class JavaCodeParser extends JavaTokenParsers  {
         methodDeclarator._1,
         methodModifier.exists( e => ( e.name == "static" ) ),
         methodModifier.toArray,
-        new TypeModel(""),
+        "",
         methodDeclarator._2.map( p => new Pair(p._1, p._2.name) )
       )
     }
@@ -237,7 +238,7 @@ class JavaCodeParser extends JavaTokenParsers  {
         variableDeclarator,
         fieldModifier.exists( elm => if (elm != null) elm.name == "static" else false ),
         fieldModifier.toArray,
-        myType)
+        myType.name)
     }
   }
 
@@ -274,7 +275,7 @@ class JavaCodeParser extends JavaTokenParsers  {
         methodHeader._3._1,
         methodHeader._1.exists( e => e.name == "static" ),
         methodHeader._1.toArray,
-        methodHeader._2,
+        methodHeader._2.name,
         methodHeader._3._2.map( p => new Pair(p._1, p._2.name) )
       )
     }
