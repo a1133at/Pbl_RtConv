@@ -11,7 +11,7 @@ import reflect.BeanProperty
  */
 
 trait IMemberModel {
-  @BeanProperty val type_m: TypeModel
+  @BeanProperty val type_m: String
   @BeanProperty val modifiers: Array[ModifierModel]
   @BeanProperty val isStatic: Boolean
   @BeanProperty val name: String

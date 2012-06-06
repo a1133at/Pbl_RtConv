@@ -13,7 +13,7 @@ import reflect.BeanProperty
 case class MethodModel(@BeanProperty val name: String,
                        @BeanProperty val isStatic: Boolean,
                        @BeanProperty val modifiers: Array[ModifierModel],
-                       @BeanProperty val type_m: TypeModel,
+                       @BeanProperty val type_m: String,
                        @BeanProperty var parameters: Map[String, String])
   extends IMemberModel {
 

@@ -13,5 +13,5 @@ import reflect.BeanProperty
 case class FieldModel(@BeanProperty val name: String,
                       @BeanProperty val isStatic: Boolean,
                       @BeanProperty val modifiers: Array[ModifierModel],
-                      @BeanProperty val type_m: TypeModel)  extends IMemberModel {
+                      @BeanProperty val type_m: String)  extends IMemberModel {
 }
