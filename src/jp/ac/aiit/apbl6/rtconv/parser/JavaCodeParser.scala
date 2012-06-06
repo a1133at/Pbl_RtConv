@@ -11,13 +11,59 @@ package jp.ac.aiit.apbl6.rtconv.parser
 import model.ExClassModel
 import scala.util.parsing.combinator._
 import jp.ac.aiit.apbl6.rtconv.model._
+import java.io.FileReader
+
+object JavaCodeParser extends JavaCodeParser {
+  def ParseJavaCode(fileList: Array[String]): Array[JavaModel] = {
+    val list = List[JavaModel]() ++ fileList.map( p => parseAll(Java, new FileReader(p)).get )
+    //クラス(_1)とインターフェース(_2)
+    val clsinf: (List[JavaModel], List[JavaModel]) = list.span( _.body.isInstanceOf[ExClassModel] )
+    //継承あり(_1)となし(_2)
+    val exCls: (List[JavaModel], List[JavaModel]) = clsinf._1.span( existExtendCls(_) )
+    ( List() ++ exCls._1.map( getExtendInf( _, list ) ) ++ clsinf._2 ++ exCls._2 ).toArray
+  }
+
+  def existExtendCls( javaModel:JavaModel ):Boolean = {
+    if( 0 != javaModel.body.asInstanceOf[ExClassModel].exClassName.size ||
+      0 != javaModel.body.asInstanceOf[ExClassModel].exInterfaces.size){
+      true
+    }
+    else{
+      false
+    }
+  }
+
+  def getExtendInf(exCls:JavaModel, javaList:List[JavaModel]): JavaModel = {
+    val cls = exCls.body.asInstanceOf[ExClassModel]
+    val ex = javaList.find( _.body.name == cls.exClassName(0) )
+    var list = List[JavaModel]()
+    for ( name <- cls.exInterfaces ){
+      val op: Option[JavaModel] = javaList.find( _.body.name == name )
+      if ( op != None ){
+        op.get :: list
+      }
+    }
+    new JavaModel(
+      exCls.packageName,
+      exCls.imports,
+      new ClassModel(
+        cls.name,
+        cls.modifiers,
+        list.map( p => p.body.asInstanceOf[InterfaceModel] ).toArray,
+        if(ex != None) ex.get.body.asInstanceOf[ClassModel] else null,
+        cls.members
+      )
+    )
+  }
+
+}
 
 class JavaCodeParser extends JavaTokenParsers  {
   /*
    * Javaコード全体の定義
    * <Java>::= <MyPackage> {<Import>} ( <Class> | <Interface> )
    */
-  def Java: Parser[Any] = MyPackage~rep(Import)~( Class | Interface ) ^^ {
+  def Java: Parser[JavaModel] = MyPackage~rep(Import)~( Class | Interface ) ^^ {
     case myPackage~importList~javaBody => {
       new JavaModel(myPackage, importList.toArray, javaBody)
     }
@@ -68,8 +114,8 @@ class JavaCodeParser extends JavaTokenParsers  {
   }
 
   def InterfaceMemberDeclaration: Parser[IMemberModel] =(
-     ConstantDeclaration ^^ ( x => x )
-   | AbstractMethodDeclaration ^^ ( x => x ))
+    ConstantDeclaration ^^ ( x => x )
+      | AbstractMethodDeclaration ^^ ( x => x ))
 
   def ConstantDeclaration: Parser[FieldModel] = rep(ConstantModifiers)~MyType~VariableDeclarator~";" ^^ {
     case constantModifiers~myType~variableDeclarator~";" => {
@@ -82,25 +128,25 @@ class JavaCodeParser extends JavaTokenParsers  {
   }
 
   def ConstantModifiers: Parser[ModifierModel] = (
-                                                    "public"   ^^ ( x => ModifierModel.PUBLIC )
-                                                  | "static"   ^^ ( x => ModifierModel.STATIC )
-                                                  | "final"    ^^ ( x => null ) )
+    "public"   ^^ ( x => ModifierModel.PUBLIC )
+      | "static"   ^^ ( x => ModifierModel.STATIC )
+      | "final"    ^^ ( x => null ) )
 
   def AbstractMethodDeclaration: Parser[ MethodModel ] =
     rep(AbstractMethodModifier)~ResultType~MethodDeclarator~";" ^^ {
-        case abstractMethodModifier~resultType~methodDeclarator~";" => {
-          new MethodModel(
-                           methodDeclarator._1,
-                           abstractMethodModifier.exists( e => e.name == "static" ),
-                           abstractMethodModifier.toArray,
-                           resultType,
-                           methodDeclarator._2)
-        }
+      case abstractMethodModifier~resultType~methodDeclarator~";" => {
+        new MethodModel(
+          methodDeclarator._1,
+          abstractMethodModifier.exists( e => e.name == "static" ),
+          abstractMethodModifier.toArray,
+          resultType,
+          methodDeclarator._2.map( p => new Pair(p._1, p._2.name) ))
       }
+    }
 
   def AbstractMethodModifier: Parser[ModifierModel] = (
-                                              "public"    ^^ ( x => ModifierModel.PUBLIC )
-                                            | "abstract"  ^^ ( x => ModifierModel.ABSTRACT ) )
+    "public"    ^^ ( x => ModifierModel.PUBLIC )
+      | "abstract"  ^^ ( x => ModifierModel.ABSTRACT ) )
 
 
   /*
@@ -130,9 +176,9 @@ class JavaCodeParser extends JavaTokenParsers  {
     }
 
   def ClassModifier: Parser[ModifierModel] = (
-     "public"   ^^ ( x => ModifierModel.PUBLIC )
-   | "abstract" ^^ ( x => ModifierModel.ABSTRACT )
-   | "final"    ^^ ( x => null ) )
+    "public"   ^^ ( x => ModifierModel.PUBLIC )
+      | "abstract" ^^ ( x => ModifierModel.ABSTRACT )
+      | "final"    ^^ ( x => null ) )
 
   def MySuper: Parser[String] = "extends"~ClassType ^^ {
     case "extends"~classType => classType
@@ -150,7 +196,7 @@ class JavaCodeParser extends JavaTokenParsers  {
   }
 
   def ClassBodyDeclaration: Parser[IMemberModel] = ( ClassMemberDeclaration ^^ ( x => x )
-                                                    | StaticInitializer ^^ ( x => x ) )
+    | StaticInitializer ^^ ( x => x ) )
 
   def StaticInitializer: Parser[MethodModel] = "static"~MyBlock ^^ {
     case "static"~myBlock => new MethodModel(
@@ -158,13 +204,13 @@ class JavaCodeParser extends JavaTokenParsers  {
       true,
       ( Array():Array[ModifierModel] ),
       new TypeModel(""),
-      (Map():Map[String,TypeModel])
+      (Map():Map[String,String])
     )
   }
 
   def ClassMemberDeclaration: Parser[IMemberModel] =( FieldDeclaration ^^ ( x => x )
-                                                    | MethodDeclaration ^^ ( x => x )
-                                                    | ClassConstractor ^^ ( x => x ) )
+    | MethodDeclaration ^^ ( x => x )
+    | ClassConstractor ^^ ( x => x ) )
 
   def ClassConstractor: Parser[MethodModel] = rep(MethodModifier)~MethodDeclarator~MethodBody ^^ {
     case methodModifier~methodDeclarator~methodBody => {
@@ -173,7 +219,7 @@ class JavaCodeParser extends JavaTokenParsers  {
         methodModifier.exists( e => ( e.name == "static" ) ),
         methodModifier.toArray,
         new TypeModel(""),
-        methodDeclarator._2
+        methodDeclarator._2.map( p => new Pair(p._1, p._2.name) )
       )
     }
   }
@@ -196,21 +242,21 @@ class JavaCodeParser extends JavaTokenParsers  {
   }
 
   def FieldModifier: Parser[ModifierModel] =(   "public"      ^^ (x => ModifierModel.PUBLIC )
-                                              | "protected"   ^^ (x => ModifierModel.PROTECTED)
-                                              | "private"     ^^ (x => ModifierModel.PRIVATE)
-                                              | "static"      ^^ (x => ModifierModel.STATIC)
-                                              | "final"       ^^ (x => null)
-                                              | "transient"   ^^ (x => null)
-                                              | "volatile"    ^^ (x => null) )
+    | "protected"   ^^ (x => ModifierModel.PROTECTED)
+    | "private"     ^^ (x => ModifierModel.PRIVATE)
+    | "static"      ^^ (x => ModifierModel.STATIC)
+    | "final"       ^^ (x => null)
+    | "transient"   ^^ (x => null)
+    | "volatile"    ^^ (x => null) )
 
   def VariableDeclarator: Parser[String] = VariableDeclaratorId
   //  def VariableDeclaratorId: Parser[Any] = Identifier | VariableDeclaratorId~"["~"]"
   def VariableDeclaratorId: Parser[String] = (
-        Identifier ^^ (x => x)
+    Identifier ^^ (x => x)
       | Identifier~"["~"]" ^^ {
-          case identifier~"["~"]" => identifier + "[]"
-        }
-  )
+      case identifier~"["~"]" => identifier + "[]"
+    }
+    )
   /*
   *　メソッド定義
   * <MethodDeclaration> ::= <MethodHeader> <MethodBody>
@@ -229,30 +275,30 @@ class JavaCodeParser extends JavaTokenParsers  {
         methodHeader._1.exists( e => e.name == "static" ),
         methodHeader._1.toArray,
         methodHeader._2,
-        methodHeader._3._2
+        methodHeader._3._2.map( p => new Pair(p._1, p._2.name) )
       )
     }
   }
 
   def MethodHeader: Parser[ Tuple3[ List[ModifierModel], TypeModel, Pair[ String, Map[String, TypeModel] ] ] ]
-    = rep(MethodModifier)~ResultType~MethodDeclarator ^^ {
-      case methodModifier~resultType~methodDeclarator => {
-        new Tuple3( methodModifier, resultType, methodDeclarator )
-      }
+  = rep(MethodModifier)~ResultType~MethodDeclarator ^^ {
+    case methodModifier~resultType~methodDeclarator => {
+      new Tuple3( methodModifier, resultType, methodDeclarator )
     }
+  }
 
   def ResultType: Parser[TypeModel] =(  MyType
-                                      | "void" ^^ ( x => new TypeModel(x) ) )
+    | "void" ^^ ( x => new TypeModel(x) ) )
 
   def MethodModifier: Parser[ModifierModel] =(
-                                      "public"        ^^ ( x => ModifierModel.PUBLIC )
-                                    | "protected"      ^^ ( x => ModifierModel.PROTECTED )
-                                    | "private"      ^^ ( x => ModifierModel.PRIVATE )
-                                    | "abstract"      ^^ ( x => ModifierModel.ABSTRACT )
-                                    | "final"         ^^ ( x => null )
-                                    | "static"        ^^ ( x => ModifierModel.STATIC )
-                                    | "synchronized" ^^ ( x => null )
-                                    | "native"         ^^ ( x => null ) )
+    "public"        ^^ ( x => ModifierModel.PUBLIC )
+      | "protected"      ^^ ( x => ModifierModel.PROTECTED )
+      | "private"      ^^ ( x => ModifierModel.PRIVATE )
+      | "abstract"      ^^ ( x => ModifierModel.ABSTRACT )
+      | "final"         ^^ ( x => null )
+      | "static"        ^^ ( x => ModifierModel.STATIC )
+      | "synchronized" ^^ ( x => null )
+      | "native"         ^^ ( x => null ) )
   def MethodDeclarator: Parser[ Pair[ String, Map[String, TypeModel] ] ] = Identifier~"("~FormalParameterList~")" ^^ {
     case identifier~"("~formalParameterList~")" => {
       Pair(identifier, formalParameterList)
@@ -282,7 +328,7 @@ class JavaCodeParser extends JavaTokenParsers  {
    * <MyInterfaceType> ::= <type name>
    */
   def MyType: Parser[TypeModel] = (
-        MyPrimitiveType ^^ ( x => new TypeModel(x) )
+    MyPrimitiveType ^^ ( x => new TypeModel(x) )
       | MyReferenceType ^^ ( x => new TypeModel(x) ) )
 
   def MyPrimitiveType: Parser[String] = MyNumericType | "boolean"
