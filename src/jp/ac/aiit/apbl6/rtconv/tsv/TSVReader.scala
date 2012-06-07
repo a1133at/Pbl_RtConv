@@ -13,7 +13,7 @@ import jp.ac.aiit.apbl6.rtconv.model._
 
 object TSVReader {
 
-  def getModelFromTSV(path: String) = {
+  def getModelFromTSV(path: String): List[JavaModel] = {
     val lines = Source.fromFile(path).getLines().toList //line
     val idxLines = lines.map(l => l.split("\t")).zipWithIndex.map(l => (l._2, l._1)).toMap //(idx, line)
 
@@ -22,7 +22,13 @@ object TSVReader {
     val classMap = idxLines.withFilter(l => l._2(0) == "CLASS" || l._2(0) == "@CLASS" ).
       map(i => (i._2(1).toInt, getClassModel(idxLines, i._1, extendMap)))
     val interfaceMap = idxLines.withFilter(l => l._2(0) == "INTERFACE").
-      map(l => (l._2(1).toInt, getClassModel(idxLines, l._1, extendMap)))
+      map(l => (l._2(1).toInt, getInterfaceModel(idxLines, l._1)))
+    val classPackSet = idxLines.withFilter(l => l._2(0) == "CLASS" || l._2(0) == "@CLASS" || l._2(0) == "INTERFACE").
+      map(i => (i._2(1).toInt, i._2(10)))
+
+    List()++
+      classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))++
+      interfaceMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))
   }
 
   def getClassModel(idxLines: Map[Int, Array[String]], idx: Int, extendMap: Map[Int, Int]): ClassModel = {
