@@ -34,8 +34,10 @@ object TSVReader {
   def getClassModel(idxLines: Map[Int, Array[String]], idx: Int, extendMap: Map[Int, Int]): ClassModel = {
     ClassModel(idxLines(idx)(2),
       getModifiers(idxLines(idx)).toArray,
-      getInterfaces(idxLines, idxLines.filter(l => extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt && l._2(0) == "INTERFACE").keySet.toList).toArray,
-      getClassModel(idxLines, idxLines.find(l => extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt  && l._2(0) != "INTERFACE").get._1, extendMap),
+      getInterfaces(idxLines, idxLines.filter(l => extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt &&
+        l._2(0) == "INTERFACE").keySet.toList).toArray,
+      getClassModel(idxLines, idxLines.find(l => extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt  &&
+        l._2(0) != "INTERFACE").get._1, extendMap),
       getMembers(classLines(idxLines, idx)).toArray)
   }
 

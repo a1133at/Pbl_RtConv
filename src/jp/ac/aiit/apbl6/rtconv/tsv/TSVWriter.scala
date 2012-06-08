@@ -13,9 +13,7 @@ import java.io.{FileOutputStream, OutputStreamWriter}
  */
 
 object TSVWriter {
-
-
-  def write(models: Array[JavaModel], filePath: String): Unit = {
+  def write(models: List[JavaModel], filePath: String) = {
     val writer = new OutputStreamWriter(new FileOutputStream(filePath, false),"UTF-8")
     getStrList(models.toList).foreach(line => writer.write(line + "\r\n"))
     writer.close()
