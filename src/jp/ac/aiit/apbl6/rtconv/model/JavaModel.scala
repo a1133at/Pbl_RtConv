@@ -12,5 +12,5 @@ import reflect.BeanProperty
 
 case class JavaModel(@BeanProperty val packageName: String,
                      @BeanProperty val imports: Array[ImportModel],
-                     @BeanProperty var body: JavaBodyModel) {
+                     @BeanProperty var body: Option[JavaBodyModel]) {
 }
