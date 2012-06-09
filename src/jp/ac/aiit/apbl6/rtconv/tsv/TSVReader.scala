@@ -27,40 +27,50 @@ object TSVReader {
       map(i => (i._2(1).toInt, i._2(10)))
 
     List()++
-      classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))++
+      classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt) ,null,c._2))++
       interfaceMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))
   }
 
-  def getClassModel(idxLines: Map[Int, Array[String]], idx: Int, extendMap: Map[Int, Int]): ClassModel = {
-    ClassModel(idxLines(idx)(2),
+  def getClassModel(idxLines: Map[Int, Array[String]], idx: Int, extendMap: Map[Int, Int]): Option[ClassModel] = {
+    if (idxLines.isEmpty || idx == -1 || extendMap.isEmpty) return None
+    Some(ClassModel(idxLines(idx)(2),
       getModifiers(idxLines(idx)).toArray,
-      getInterfaces(idxLines, idxLines.filter(l => extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt &&
+      getInterfaces(idxLines, idxLines.filter(l => extendMap.contains(idxLines(idx)(1).toInt) &&
+        l._2.length > 1 && l._2(1).forall{ _.isDigit }  &&
+        extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt &&
         l._2(0) == "INTERFACE").keySet.toList).toArray,
-      getClassModel(idxLines, idxLines.find(l => extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt  &&
-        l._2(0) != "INTERFACE").get._1, extendMap),
-      getMembers(classLines(idxLines, idx)).toArray)
+      getClassModel(idxLines, idxLines.find(l => extendMap.contains(idxLines(idx)(1).toInt) &&
+        l._2.length > 1 && l._2(1).forall{ _.isDigit } &&
+        extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt  &&
+        l._2(0) != "INTERFACE").getOrElse((-1, -1))._1, extendMap),
+        getMembers(idxLines).toArray))
+    //getMembers(classLines(idxLines, idx)).toArray))
   }
 
   def getInterfaces(idxList:Map[Int, Array[String]], idxs: List[Int]): List[InterfaceModel] = {
-    List()++idxs.map(i => getInterfaceModel(idxList, i)).toList
+    var list = List[InterfaceModel]()
+    List()++idxs.map(i => getInterfaceModel(idxList, i)).collect({ case Some(j) => j }).toList
   }
 
-  def getInterfaceModel(idxLines: Map[Int, Array[String]], id: Int): InterfaceModel = {
-    val line = idxLines.find(p => p._2(1) == id).get
-    InterfaceModel(line._2(2), getMembers(classLines(idxLines, line._1)).toArray)
+  def getInterfaceModel(idxLines: Map[Int, Array[String]], id: Int): Option[InterfaceModel] = {
+    val line = idxLines.filter(_._2.length > 2).find(p => p._2(1) == id).getOrElse(null)
+    if (line == null) return None
+    Some(InterfaceModel(line._2(2), getMembers(classLines(idxLines, line._1)).toArray))
   }
 
   private def getMembers(lines: Map[Int, Array[String]]): List[IMemberModel] = {
-    List()++lines.map({
+    List()++lines.collect({
       case l if l._2(0) == "ATTRIBUTE" =>
         FieldModel(l._2(1), false,getModifiers(l._2).toArray, l._2(2))
       case l if l._2(0).indexOf("METHOD") != -1 =>
-        MethodModel(l._2(1), false, getModifiers(l._2).toArray, l._2(2) ,getParameters(lines, l._1))}).toList
+        MethodModel(l._2(1), false, getModifiers(l._2).toArray, l._2(2) ,getParameters(lines, l._1))})
   }
 
   private def getParameters(lines: Map[Int, Array[String]], idx: Int): Map[String, String] = {
-    Map()++((idx + 1) to (lines.find(l => l._1 > idx && l._2(0) != "PARAM").get._1 - 1)).
-      map(i => (lines(i)(1), lines(i)(2)))
+    val sLines = lines.toList.sortWith(_._1 < _._1)
+    if (((idx + 1) - sLines.find(l => l._1 > idx && l._2(0) != "PARAM").get._1 - 1) == 0) return Map()
+    Map()++((idx + 1) to (sLines.find(l => l._1 > idx && l._2(0) != "PARAM").get._1 - 1)).
+      map(i => (sLines(i)._2(1), sLines(i)._2(2)))
   }
 
   private def getModifiers(ary: Array[String]):List[ModifierModel] = {
@@ -68,7 +78,9 @@ object TSVReader {
     ary.foreach({case "public" => modifiers = ModifierModel.PUBLIC :: modifiers
                  case "private" => modifiers = ModifierModel.PRIVATE :: modifiers
                  case "protected" => modifiers = ModifierModel.PROTECTED :: modifiers
-                 case "@CLASS" => modifiers = ModifierModel.ABSTRACT :: modifiers})
+                 case "@CLASS" => modifiers = ModifierModel.ABSTRACT :: modifiers
+                 case _ =>
+    })
     modifiers
   }
 
