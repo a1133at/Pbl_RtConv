@@ -11,11 +11,16 @@ import java.io.File
  */
 
 class DirectoryCreater {
-  def createDirectory(packageName: String): String = {
-    var parent  =  ""
-    val dirs = "output"::(packageName split Array('.')).toList
+  def createDirectory(outputDir: String, packageName: String): String = {
+    val output = new File(outputDir)
+    if (!output.exists){
+      output.mkdir()
+    }
+
+    var parent  =  outputDir
+    val dirs = (packageName split Array('.')).toList
     for (dir <- dirs) {
-      parent = parent + "." + File.separator + dir
+      parent = File.separator + parent + "." + File.separator + dir
       val newDir = new File(parent)
       if (!newDir.exists){
         newDir.mkdir()
