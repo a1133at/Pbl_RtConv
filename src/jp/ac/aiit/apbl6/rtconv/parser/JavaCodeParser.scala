@@ -336,7 +336,7 @@ class JavaCodeParser extends JavaTokenParsers  {
   def MyNumericType: Parser[String] = IntegralType | FloatingPointType
   def IntegralType: Parser[String] = "byte" | "short" | "int" | "long" | "char"
   def FloatingPointType: Parser[String] = "float" | "double"
-  def MyReferenceType: Parser[String] = ClassOrInterfaceType | MyArrayType
+  def MyReferenceType: Parser[String] = MyArrayType | ClassOrInterfaceType
   def ClassOrInterfaceType: Parser[String] = MyClassType | MyInterfaceType
   def MyClassType: Parser[String] = TypeName
   def MyInterfaceType: Parser[String] = TypeName
