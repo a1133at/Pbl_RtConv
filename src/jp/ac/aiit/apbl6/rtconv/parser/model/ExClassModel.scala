@@ -13,7 +13,7 @@ import jp.ac.aiit.apbl6.rtconv.model._
 class ExClassModel(name: String,
                    modifiers: Array[ModifierModel],
                    interfaces: Array[InterfaceModel],
-                   extendClass: ClassModel,
+                   extendClass: Option[ClassModel],
                    members: Array[IMemberModel],
                    val exClassName : List[String],
                    val exInterfaces: List[String])
