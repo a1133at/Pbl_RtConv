@@ -13,7 +13,7 @@ import reflect.BeanProperty
 case class ClassModel(@BeanProperty val name: String,
                       @BeanProperty val modifiers: Array[ModifierModel],
                       @BeanProperty val interfaces: Array[InterfaceModel],
-                      @BeanProperty val extendsClass: ClassModel,
+                      @BeanProperty val extendsClass: Option[ClassModel],
                       @BeanProperty val members: Array[IMemberModel]
                   ) extends JavaBodyModel{
 
