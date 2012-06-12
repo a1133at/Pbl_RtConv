@@ -12,15 +12,30 @@ import model.ExClassModel
 import scala.util.parsing.combinator._
 import jp.ac.aiit.apbl6.rtconv.model._
 import java.io.FileReader
+import io.Source
 
 object JavaCodeParser extends JavaCodeParser {
   def ParseJavaCode(fileList: Array[String]): Array[JavaModel] = {
-    val list = List[JavaModel]() ++ fileList.map( p => parseAll(Java, new FileReader(p)).get )
+    val list = fileList.map( p => delete( Source.fromFile(p).getLines().mkString("\n").toCharArray ).mkString )
+    val list2 = List[JavaModel]() ++ list.map( p => parseAll(Java, p).get )
     //クラス(_1)とインターフェース(_2)
     val clsinf: (List[JavaModel], List[JavaModel]) = list.span( _.body.isInstanceOf[ExClassModel] )
     //継承あり(_1)となし(_2)
     val exCls: (List[JavaModel], List[JavaModel]) = clsinf._1.span( existExtendCls(_) )
     ( List() ++ exCls._1.map( getExtendInf( _, list ) ) ++ clsinf._2 ++ exCls._2 ).toArray
+  }
+
+  def delete(file: Array[Char]): Array[Char] = {
+    val s = file.mkString
+    file.take( file.indexOf('}') ).count( p => p == '{' ) match {
+      case x if ( x >= 2 ) =>{
+        val sp = file.splitAt( file.indexOf('}')+1 )
+        delete(
+          sp._1.take( sp._1.lastIndexWhere( p => p == '{') ) ++ sp._2
+        )
+      }
+      case _ => { file }
+    }
   }
 
   def existExtendCls( javaModel:JavaModel ):Boolean = {
@@ -209,12 +224,13 @@ class JavaCodeParser extends JavaTokenParsers  {
     )
   }
 
-  def ClassMemberDeclaration: Parser[IMemberModel] =( FieldDeclaration ^^ ( x => x )
-    | MethodDeclaration ^^ ( x => x )
-    | ClassConstractor ^^ ( x => x ) )
+    def ClassMemberDeclaration: Parser[IMemberModel] =(
+        MethodDeclaration ^^ ( x => x )
+      | ClassConstractor ^^ ( x => x )
+      | FieldDeclaration ^^ ( x => x ) )
 
-  def ClassConstractor: Parser[MethodModel] = rep(MethodModifier)~MethodDeclarator~MethodBody ^^ {
-    case methodModifier~methodDeclarator~methodBody => {
+  def ClassConstractor: Parser[MethodModel] = rep(MethodModifier)~MethodDeclarator ^^ {
+    case methodModifier~methodDeclarator => {
       new MethodModel(
         methodDeclarator._1,
         methodModifier.exists( e => ( e.name == "static" ) ),
@@ -269,8 +285,8 @@ class JavaCodeParser extends JavaTokenParsers  {
   * <FormalParameter> ::= <MyType> <VariableDeclaratorId>
   * <method body> ::= <MyBlock> | ;
   */
-  def MethodDeclaration: Parser[MethodModel] = MethodHeader~MethodBody ^^ {
-    case methodHeader~methodBody => {
+  def MethodDeclaration: Parser[MethodModel] = MethodHeader ^^ {
+    case methodHeader => {
       new MethodModel(
         methodHeader._3._1,
         methodHeader._1.exists( e => e.name == "static" ),
