@@ -17,12 +17,12 @@ import io.Source
 object JavaCodeParser extends JavaCodeParser {
   def ParseJavaCode(fileList: Array[String]): Array[JavaModel] = {
     val list = fileList.map( p => delete( Source.fromFile(p).getLines().mkString("\n").toCharArray ).mkString )
-    val list2 = List[JavaModel]() ++ list.map( p => parseAll(Java, p).get )
+    val javaModels = List[JavaModel]() ++ list.map( p => parseAll(Java, p).get )
     //クラス(_1)とインターフェース(_2)
-    val clsinf: (List[JavaModel], List[JavaModel]) = list.span( _.body.isInstanceOf[ExClassModel] )
+    val clsinf: (List[JavaModel], List[JavaModel]) = javaModels.span( _.body.isInstanceOf[ExClassModel] )
     //継承あり(_1)となし(_2)
     val exCls: (List[JavaModel], List[JavaModel]) = clsinf._1.span( existExtendCls(_) )
-    ( List() ++ exCls._1.map( getExtendInf( _, list ) ) ++ clsinf._2 ++ exCls._2 ).toArray
+    ( List() ++ exCls._1.map( getExtendInf( _, javaModels ) ) ++ clsinf._2 ++ exCls._2 ).toArray
   }
 
   def delete(file: Array[Char]): Array[Char] = {
