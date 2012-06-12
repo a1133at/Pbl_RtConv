@@ -43,7 +43,7 @@ object TSVWriter {
 
 
   private def toStrListClass(m: ClassModel, cId: Int, pId :Int): List[String] = {
-    val classFormat = "%s\t%s\t%s\t%s\t0\t0\t0\t0\t0\t\t%s"
+    val classFormat = "%s\t%s\t%s\t%s\t0\t0\t24\t40\t56\t80\t%s\t204\t255\t255"
     val classType = if (isAbstract(m.modifiers.toList))  "@CLASS" else "CLASS"
     List(classFormat.format(classType, cId,m.name,getVisibility(m.modifiers.toList),pId))++
                             m.members.flatMap({case mem: FieldModel => toStrListField(mem)

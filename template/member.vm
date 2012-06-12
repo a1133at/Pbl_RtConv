@@ -3,10 +3,10 @@
 #if($member.isMethod())
 
 #set($head = "false")
-    #foreach( $modifier in $member.modifiers)$modifier.name #end$member.type_m.name $member.name()(#foreach($parameter in $member.getParametersAsArray())#if($head == "true"), #else #set($head = "true")#end #set($params = "$parameter.toString()") #set($temp = $params.indexOf( ',' )) #set($start = $temp + 1)$params.substring($start, $params.lastIndexOf( ')' )) $params.substring(1, $params.indexOf( "," ))#end) {
+    #foreach( $modifier in $member.modifiers)$modifier.name #end$member.type_m $member.name()(#foreach($parameter in $member.getParametersAsArray())#if($head == "true"), #else #set($head = "true")#end #set($params = "$parameter.toString()") #set($temp = $params.indexOf( ',' )) #set($start = $temp + 1)$params.substring($start, $params.lastIndexOf( ')' )) $params.substring(1, $params.indexOf( "," ))#end) {
     }
 #else
 
-    #foreach( $modifier in $member.modifiers)$modifier.name #end$member.type_m.name $member.name;
+    #foreach( $modifier in $member.modifiers)$modifier.name #end$member.type_m $member.name;
 #end
 #end
