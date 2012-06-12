@@ -34,7 +34,7 @@ object TSVWriter {
   /**
    * create String List for Body of tsv
    */
-  private def getStrListBody(bodyIdMap: List[(JavaBodyModel, Int, Int)]): List[String] = {
+  private def getStrListBody(bodyIdMap: List[(Option[JavaBodyModel], Int, Int)]): List[String] = {
     List[String]()++bodyIdMap.flatMap({case t:(ClassModel,Int, Int) => toStrListClass(t._1, t._3, t._2)
                                        case t:(InterfaceModel, Int, Int) => toStrListInf(t._1, t._3, t._2)
                                        case _ => List[String]()})
@@ -77,12 +77,12 @@ object TSVWriter {
     }
   }
 
-  private def getStrListRelation(bodyIdMap: List[(JavaBodyModel, Int, Int)]): List[String] = {
+  private def getStrListRelation(bodyIdMap: List[(Option[JavaBodyModel], Int, Int)]): List[String] = {
     val classList = bodyIdMap.filter( p => ( p._1.isInstanceOf[ClassModel] ) )
     val exList = classList.filter( p => ( null != p._1.asInstanceOf[ClassModel].extendsClass )  )
     var IdMap = Map[Int,Int]()
     for( elm <- exList ){
-      val obj = classList.find( _._1.name == elm._1.name )
+      val obj = classList.find( a =>  a._1.isDefined && elm._1.isDefined && a._1.get.name == elm._1.get.name )
       if (obj != None){
         IdMap = IdMap + (elm._2 -> obj.get._2)
       }
