@@ -82,7 +82,7 @@ object TSVReader {
                  case _ =>
     })
     modifiers
-  }
+  } 
 
   private def isJavaBodyLine(str: String) =
     str == "CLASS" || str == "@CLASS" || str == "INTERFACE"
