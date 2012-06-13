@@ -35,8 +35,8 @@ object TSVWriter {
    * create String List for Body of tsv
    */
   private def getStrListBody(bodyIdMap: List[(Option[JavaBodyModel], Int, Int)]): List[String] = {
-    List[String]()++bodyIdMap.flatMap({case t:(ClassModel,Int, Int) => toStrListClass(t._1, t._3, t._2)
-                                       case t:(InterfaceModel, Int, Int) => toStrListInf(t._1, t._3, t._2)
+    List[String]()++bodyIdMap.flatMap({case t:(Some[ClassModel],Int, Int) => toStrListClass(t._1.get, t._3, t._2)
+                                       case t:(Some[InterfaceModel], Int, Int) => toStrListInf(t._1.get, t._3, t._2)
                                        case _ => List[String]()})
   }
  // private def getBodyIdMap(models: List[JavaModel], packMap: Map[String, Int]): List[(JavaBodyModel, Int, Int)] = {null}
