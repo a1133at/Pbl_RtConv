@@ -28,7 +28,7 @@ object GeneratorMain {
       velWrapper.put("javaModel", model)
       val result = velWrapper.merge()
 
-      val pw	= new PrintWriter(model.getPackageName() + File.separator + model.getBody().getName() + ".java", "UTF-8")
+      val pw	= new PrintWriter(model.getPackageName() + File.separator + model.body.get.name + ".java", "UTF-8")
       pw.print(result)
       pw.close()
     }

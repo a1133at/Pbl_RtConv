@@ -50,10 +50,10 @@ object JavaCodeParser extends JavaCodeParser {
 
   def getExtendInf(exCls:JavaModel, javaList:List[JavaModel]): JavaModel = {
     val cls = exCls.body.asInstanceOf[ExClassModel]
-    val ex = javaList.find( _.body.name == cls.exClassName(0) )
+    val ex = javaList.find( a =>  a.body.isDefined && a.body.get.name == cls.exClassName(0) )
     var list = List[JavaModel]()
     for ( name <- cls.exInterfaces ){
-      val op: Option[JavaModel] = javaList.find( _.body.name == name )
+      val op: Option[JavaModel] = javaList.find( a =>  a.body.isDefined && a.body.get.name == name )
       if ( op != None ){
         op.get :: list
       }
@@ -61,13 +61,13 @@ object JavaCodeParser extends JavaCodeParser {
     new JavaModel(
       exCls.packageName,
       exCls.imports,
-      new ClassModel(
+      Option(new ClassModel(
         cls.name,
         cls.modifiers,
         list.map( p => p.body.asInstanceOf[InterfaceModel] ).toArray,
-        if(ex != None) ex.get.body.asInstanceOf[ClassModel] else null,
+        if(ex != None) Option(ex.get.body.asInstanceOf[ClassModel]) else None,
         cls.members
-      )
+      ))
     )
   }
 
@@ -80,7 +80,7 @@ class JavaCodeParser extends JavaTokenParsers  {
    */
   def Java: Parser[JavaModel] = MyPackage~rep(Import)~( Class | Interface ) ^^ {
     case myPackage~importList~javaBody => {
-      new JavaModel(myPackage, importList.toArray, javaBody)
+      new JavaModel(myPackage, importList.toArray, Option(javaBody))
     }
   }
   /*
