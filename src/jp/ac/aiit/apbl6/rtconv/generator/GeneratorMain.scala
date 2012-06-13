@@ -6,7 +6,7 @@ import org.apache.velocity._
 import java.lang.reflect.Modifier
 import reflect.Field
 import jp.ac.aiit.apbl6.rtconv.model._
-import tools.nsc.io.Directory
+//import tools.nsc.io.Directory
 
 /**
  * Created with IntelliJ IDEA.
