@@ -17,7 +17,7 @@ object TSVReader {
     val lines = Source.fromFile(path).getLines().toList //line
     val idxLines = lines.map(l => l.split("\t")).zipWithIndex.map(l => (l._2, l._1)).toMap //(idx, line)
 
-    val packageMap = getMap(lines, "PACKAGE", 1, 2).map(i => (i._1.toInt, i._2)) //(Id, Name)
+    val packageMap = getMap(lines, "PACKAGE", 1, 2).map(i => (i._1.toInt, i._2))++Map(0 -> "")  //(Id, Name)
     val extendMap = getMap(lines, "EXTEND", 1, 2).map(i => (i._1.toInt, i._2.toInt)) //(SubId, SuperId)
     val classMap = idxLines.withFilter(l => l._2(0) == "CLASS" || l._2(0) == "@CLASS" ).
       map(i => (i._2(1).toInt, getClassModel(idxLines, i._1, extendMap)))
