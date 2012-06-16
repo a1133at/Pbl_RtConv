@@ -24,10 +24,11 @@ object TSVReader {
     val interfaceMap = idxLines.withFilter(l => l._2(0) == "INTERFACE").
       map(l => (l._2(1).toInt, getInterfaceModel(idxLines, l._1)))
     val classPackSet = idxLines.withFilter(l => l._2(0) == "CLASS" || l._2(0) == "@CLASS" || l._2(0) == "INTERFACE").
-      map(i => (i._2(1).toInt, i._2(10)))
+      map(i => (i._2(1).toInt, if(i._2.length >= 11) i._2(10) else "0")
+    )
 
     List()++
-      classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt) ,null,c._2))++
+      classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))++
       interfaceMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))
   }
 
