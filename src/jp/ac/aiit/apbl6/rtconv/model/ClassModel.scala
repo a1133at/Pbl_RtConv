@@ -19,6 +19,6 @@ case class ClassModel(@BeanProperty val name: String,
 
     def isModifiers():    Boolean = if ((modifiers == null)  || (modifiers.length == 0)) false else true
     def isInterfaces():   Boolean = if ((interfaces == null) || (interfaces.length == 0)) false else true
-    def isExtendsClass(): Boolean = if (extendsClass == null) false else true
+    def isExtendsClass(): Boolean = if (extendsClass.isEmpty) false else true
 
 }
