@@ -18,7 +18,7 @@ object JavaCodeParser extends JavaCodeParser {
   def ParseJavaCode(dirPath:String): Array[JavaModel] = {
     val fileList = getFileFromDir(dirPath)
     val list = fileList.map( p => delete( Source.fromFile(p).getLines().mkString("\n").toCharArray ).mkString )
-    val res = list.map( p => parseAll(Java, p))
+//    val res = list.map( p => parseAll(Java, p)).toArray
     val javaModels = List[JavaModel]() ++ list.map( p => parseAll(Java, p) .get)
     //クラス(_1)とインターフェース(_2)
     val clsinf: (List[JavaModel], List[JavaModel]) = javaModels.span( _.body.isInstanceOf[ExClassModel] )
@@ -156,7 +156,7 @@ class JavaCodeParser extends JavaTokenParsers  {
   }
 
   def ConstantModifiers: Parser[ModifierModel] = (
-    "public"   ^^ ( x => ModifierModel.PUBLIC )
+        "public"   ^^ ( x => ModifierModel.PUBLIC )
       | "static"   ^^ ( x => ModifierModel.STATIC )
       | "final"    ^^ ( x => null ) )
 
@@ -205,6 +205,7 @@ class JavaCodeParser extends JavaTokenParsers  {
 
   def ClassModifier: Parser[ModifierModel] = (
     "public"   ^^ ( x => ModifierModel.PUBLIC )
+      | "protected"   ^^ ( x => ModifierModel.PROTECTED )
       | "abstract" ^^ ( x => ModifierModel.ABSTRACT )
       | "final"    ^^ ( x => null ) )
 
