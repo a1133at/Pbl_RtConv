@@ -1,5 +1,5 @@
 ## template of member (method or field)
-#foreach($member in $javaModel.body.members)
+#foreach($member in $javaModel.body.get().members)
 #if($member.isMethod())
 
 #set($head = "false")

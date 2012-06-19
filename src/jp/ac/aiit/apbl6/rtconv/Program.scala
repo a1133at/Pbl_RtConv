@@ -18,7 +18,7 @@ object Program {
     args(0) match {
       case "t2c" => GeneratorMain.write(TSVReader.getModelFromTSV(args(1)), args(2))
 
-      case "c2t" => TSVWriter.write(JavaCodeParser.ParseJavaCode(Array(args(1))).toList, args(2))
+      case "c2t" => TSVWriter.write(JavaCodeParser.ParseJavaCode(args(1)).toList, args(2))
     }
     } catch {
       case e: Exception => e.printStackTrace();

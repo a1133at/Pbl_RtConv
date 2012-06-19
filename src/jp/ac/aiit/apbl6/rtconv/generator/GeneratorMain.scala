@@ -20,17 +20,20 @@ object GeneratorMain {
   def write(models: List[JavaModel], outputDir: String): Unit = {
     // use Velocity
     val velWrapper = new VelocityWrapper(File.separator + "template" + File.separator + "templateJava.vm")
-    for (model <- models) {
+    val modelArray = models.toArray
+    for (model <- modelArray) {
       // create output directory
       val creater = new DirectoryCreater()
-      creater.createDirectory(outputDir,model.getPackageName())
+      creater.createDirectory(outputDir, model.getPackageName())
 
-      velWrapper.put("javaModel", model)
-      val result = velWrapper.merge()
-
-      val pw	= new PrintWriter(model.getPackageName() + File.separator + model.body.get.name + ".java", "UTF-8")
-      pw.print(result)
-      pw.close()
+      if (model.getBody() != None) {
+        velWrapper.put("javaModel", model)
+        val result = velWrapper.merge()
+        val pw	= new PrintWriter(outputDir + File.separator + model.getPackageName().replace(".", File.separator) + File.separator + model.getBody().get.getName() + ".java")
+        pw.print(result)
+        pw.close()
+      }
     }
+    println("program end")
   }
 }

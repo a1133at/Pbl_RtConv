@@ -11,13 +11,15 @@ package jp.ac.aiit.apbl6.rtconv.parser
 import model.ExClassModel
 import scala.util.parsing.combinator._
 import jp.ac.aiit.apbl6.rtconv.model._
-import java.io.FileReader
 import io.Source
+import java.io.{File, FileReader}
 
 object JavaCodeParser extends JavaCodeParser {
-  def ParseJavaCode(fileList: Array[String]): Array[JavaModel] = {
+  def ParseJavaCode(dirPath:String): Array[JavaModel] = {
+    val fileList = getFileFromDir(dirPath)
     val list = fileList.map( p => delete( Source.fromFile(p).getLines().mkString("\n").toCharArray ).mkString )
-    val javaModels = List[JavaModel]() ++ list.map( p => parseAll(Java, p).get )
+//    val res = list.map( p => parseAll(Java, p)).toArray
+    val javaModels = List[JavaModel]() ++ list.map( p => parseAll(Java, p) .get)
     //クラス(_1)とインターフェース(_2)
     val clsinf: (List[JavaModel], List[JavaModel]) = javaModels.span( _.body.isInstanceOf[ExClassModel] )
     //継承あり(_1)となし(_2)
@@ -25,6 +27,16 @@ object JavaCodeParser extends JavaCodeParser {
     ( List() ++ exCls._1.map( getExtendInf( _, javaModels ) ) ++ clsinf._2 ++ exCls._2 ).toArray
   }
 
+  def getFileFromDir(dir: String): List[String] = {
+    var files = List[String]()
+    //ディレクトリ(_1)とファイル(_2)
+    val map = new File(dir).listFiles().toList.partition( _.isDirectory )
+    files = files ++ map._2.filter( _.getPath.endsWith(".java") ).map( _.getPath )
+    for (dir <- map._1){
+      files = files ++ getFileFromDir(dir.getPath)
+    }
+    files
+  }
   def delete(file: Array[Char]): Array[Char] = {
     val s = file.mkString
     file.take( file.indexOf('}') ).count( p => p == '{' ) match {
@@ -144,7 +156,7 @@ class JavaCodeParser extends JavaTokenParsers  {
   }
 
   def ConstantModifiers: Parser[ModifierModel] = (
-    "public"   ^^ ( x => ModifierModel.PUBLIC )
+        "public"   ^^ ( x => ModifierModel.PUBLIC )
       | "static"   ^^ ( x => ModifierModel.STATIC )
       | "final"    ^^ ( x => null ) )
 
@@ -193,6 +205,7 @@ class JavaCodeParser extends JavaTokenParsers  {
 
   def ClassModifier: Parser[ModifierModel] = (
     "public"   ^^ ( x => ModifierModel.PUBLIC )
+      | "protected"   ^^ ( x => ModifierModel.PROTECTED )
       | "abstract" ^^ ( x => ModifierModel.ABSTRACT )
       | "final"    ^^ ( x => null ) )
 
@@ -269,7 +282,7 @@ class JavaCodeParser extends JavaTokenParsers  {
   def VariableDeclarator: Parser[String] = VariableDeclaratorId
   //  def VariableDeclaratorId: Parser[Any] = Identifier | VariableDeclaratorId~"["~"]"
   def VariableDeclaratorId: Parser[String] = (
-    Identifier ^^ (x => x)
+        Identifier ^^ (x => x)
       | Identifier~"["~"]" ^^ {
       case identifier~"["~"]" => identifier + "[]"
     }
@@ -364,7 +377,7 @@ class JavaCodeParser extends JavaTokenParsers  {
    * <MyBlock>::= { <BlockStatements> }
    * <BlockStatements>::= "" ToDo(12.5.17)：要実装
    */
-  def Identifier: Parser[String] = ident
+  def Identifier: Parser[String] = """[0-9a-zA-Z_><]*""".r
   def MyBlock: Parser[Any] = "{"~BlockStatements~"}"
   def BlockStatements: Parser[Any] = ""
 
