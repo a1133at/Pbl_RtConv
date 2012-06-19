@@ -14,22 +14,27 @@ import jp.ac.aiit.apbl6.rtconv.model._
 object TSVReader {
 
   def getModelFromTSV(path: String): List[JavaModel] = {
-    val lines = Source.fromFile(path).getLines().toList //line
-    val idxLines = lines.map(l => l.split("\t")).zipWithIndex.map(l => (l._2, l._1)).toMap //(idx, line)
+    val lines = Source.fromFile(path).getLines().toList
+    val idxLines = Source.fromFile(path).getLines().zipWithIndex.map(i => (i._2, i._1.split("\t"))).toMap //line
+    //val idxLines = zipLines.map(i => (i._2 -> i._1.split("\t"))).toMap
+    //val idxLines = lines.map(_.split("\t")).sortBy(_)zipWithIndex.map(l => (l._2, l._1)).toMap //(idx, line)
 
-    val packageMap = getMap(lines, "PACKAGE", 1, 2).map(i => (i._1.toInt, i._2))++Map(0 -> "")  //(Id, Name)
-    val extendMap = getMap(lines, "EXTEND", 1, 2).map(i => (i._1.toInt, i._2.toInt)) //(SubId, SuperId)
-    val classMap = idxLines.withFilter(l => l._2(0) == "CLASS" || l._2(0) == "@CLASS" ).
-      map(i => (i._2(1).toInt, getClassModel(idxLines, i._1, extendMap)))
+    val packageMap = getMap(idxLines, "PACKAGE", 1, 2).map(i => (i._1.toInt, i._2))++Map(0 -> "")  //(Id, Name)
+    val extendMap = getMap(idxLines, "EXTEND", 1, 2).map(i => (i._1.toInt, i._2.toInt))++Map(0 -> 0) //(SubId, SuperId)
+    val classMap = idxLines.withFilter(l =>
+        l._2(0) == "CLASS" || l._2(0) == "@CLASS" ).
+      map(i =>
+        (i._2(1).toInt, getClassModel(idxLines, i._1, extendMap)))
     val interfaceMap = idxLines.withFilter(l => l._2(0) == "INTERFACE").
       map(l => (l._2(1).toInt, getInterfaceModel(idxLines, l._1)))
     val classPackSet = idxLines.withFilter(l => l._2(0) == "CLASS" || l._2(0) == "@CLASS" || l._2(0) == "INTERFACE").
       map(i => (i._2(1).toInt, if(i._2.length >= 11) i._2(10) else "0")
     )
 
-    List()++
+    var result = List()++
       classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))++
       interfaceMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))
+    result
   }
 
   def getClassModel(idxLines: Map[Int, Array[String]], idx: Int, extendMap: Map[Int, Int]): Option[ClassModel] = {
@@ -44,8 +49,7 @@ object TSVReader {
         l._2.length > 1 && l._2(1).forall{ _.isDigit } &&
         extendMap(idxLines(idx)(1).toInt) == l._2(1).toInt  &&
         l._2(0) != "INTERFACE").getOrElse((-1, -1))._1, extendMap),
-        getMembers(idxLines).toArray))
-    //getMembers(classLines(idxLines, idx)).toArray))
+      getMembers(classLines(idxLines, idx)).toArray))
   }
 
   def getInterfaces(idxList:Map[Int, Array[String]], idxs: List[Int]): List[InterfaceModel] = {
@@ -68,10 +72,12 @@ object TSVReader {
   }
 
   private def getParameters(lines: Map[Int, Array[String]], idx: Int): Map[String, String] = {
-    val sLines = lines.toList.sortWith(_._1 < _._1)
-    if (((idx + 1) - sLines.find(l => l._1 > idx && l._2(0) != "PARAM").get._1 - 1) == 0) return Map()
-    Map()++((idx + 1) to (sLines.find(l => l._1 > idx && l._2(0) != "PARAM").get._1 - 1)).
-      map(i => (sLines(i)._2(1), sLines(i)._2(2)))
+    //val sLines = lines.toList.sortWith(_._1 < _._1)
+    val sLines = lines
+    if (((idx + 1) - sLines.find(l => l._1 > idx && l._2(0) != "PARAM").getOrElse((-1, -1))._1 - 1) >= 0)
+      return Map()
+    Map()++sLines.filter(a => (idx + 1) <= a._1 && (sLines.find(l => l._1 > idx && l._2(0) != "PARAM").get._1 - 1) >= a._1).
+      map(i => (i._2(1), i._2(2)))
   }
 
   private def getModifiers(ary: Array[String]):List[ModifierModel] = {
@@ -88,9 +94,15 @@ object TSVReader {
   private def isJavaBodyLine(str: String) =
     str == "CLASS" || str == "@CLASS" || str == "INTERFACE"
 
-  private def getMap(lines: List[String], name: String, idx1: Int, idx2: Int): Map[String, String] =
-    lines.withFilter(l => l.indexOf(name) == 0).map(l => {val s = l.split("\t"); (s(idx1), s(idx2))}).toMap
+  private def getMap(lines: Map[Int,Array[String]], name: String, idx1: Int, idx2: Int): Map[String, String] =
+    lines.withFilter(l => l._2(0) == name).map(l =>
+      (l._1.toString, l._2(idx2))).toMap
 
-  private def classLines(idxLines: Map[Int, Array[String]], idx:Int): Map[Int, Array[String]] =
-    idxLines.slice(idx, idxLines.find(l => l._1 > idx && (l._2.size == 0 || isJavaBodyLine(l._2(0)))).get._1)
+  private def classLines(idxLines: Map[Int, Array[String]], idx:Int): Map[Int, Array[String]] = {
+    var result :Map[Int,Array[String]] = Map()
+    val list = idxLines.toArray.sortBy(_._1)
+    list.slice(idx, list.find(l => l._1 > idx && (l._2.size == 0 || isJavaBodyLine(l._2(0)))).getOrElse((idx+1,null))._1).
+      foreach(i => result = result+(i._1 ->i._2))
+    result
+  }
 }
