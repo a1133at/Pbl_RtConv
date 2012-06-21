@@ -32,8 +32,8 @@ object TSVReader {
     )
 
     var result = List()++
-      classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))++
-      interfaceMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt),null,c._2))
+      classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt - 1),null,c._2))++
+      interfaceMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt - 1),null,c._2))
     result
   }
 
@@ -68,7 +68,8 @@ object TSVReader {
       case l if l._2(0) == "ATTRIBUTE" =>
         FieldModel(l._2(1), false,getModifiers(l._2).toArray, l._2(2))
       case l if l._2(0).indexOf("METHOD") != -1 =>
-        MethodModel(l._2(1), false, getModifiers(l._2).toArray, l._2(2) ,getParameters(lines, l._1))})
+        MethodModel(l._2(1), false, getModifiers(l._2).toArray,
+          if(l._2(2) == "null") "" else l._2(2) ,getParameters(lines, l._1))})
   }
 
   private def getParameters(lines: Map[Int, Array[String]], idx: Int): Map[String, String] = {
