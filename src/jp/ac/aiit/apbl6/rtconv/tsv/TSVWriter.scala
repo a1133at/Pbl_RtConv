@@ -58,7 +58,7 @@ object TSVWriter {
   }
 
   private def toStrListField(model :FieldModel): List[String] =
-    List("ATTRIBUTE\t%s\t%s\t%s".format(model.name, model.type_m, getVisibility(model.modifiers.toList)))
+    List("ATTRIB\t%s\t%s\t%s".format(model.name, model.type_m, getVisibility(model.modifiers.toList)))
 
   private def toStrListMethod(model :MethodModel): List[String] = {
     val methodType = if (isAbstract(model.modifiers.toList)) "@METHOD" else "METHOD"
