@@ -2,6 +2,7 @@ package jp.ac.aiit.apbl6.rtconv.tsv
 
 import io.Source
 import jp.ac.aiit.apbl6.rtconv.model._
+import org.omg.DynamicAny._DynArrayStub
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,7 +15,6 @@ import jp.ac.aiit.apbl6.rtconv.model._
 object TSVReader {
 
   def getModelFromTSV(path: String): List[JavaModel] = {
-    val lines = Source.fromFile(path).getLines().toList
     val idxLines = Source.fromFile(path).getLines().zipWithIndex.map(i => (i._2, i._1.split("\t"))).toMap //line
     //val idxLines = zipLines.map(i => (i._2 -> i._1.split("\t"))).toMap
     //val idxLines = lines.map(_.split("\t")).sortBy(_)zipWithIndex.map(l => (l._2, l._1)).toMap //(idx, line)
@@ -31,10 +31,9 @@ object TSVReader {
       map(i => (i._2(1).toInt, if(i._2.length >= 11) i._2(10) else "0")
     )
 
-    var result = List()++
+    List()++
       classMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt - 1),null,c._2))++
       interfaceMap.map(c => JavaModel(packageMap(classPackSet(c._1.toInt).toInt - 1),null,c._2))
-    result
   }
 
   def getClassModel(idxLines: Map[Int, Array[String]], idx: Int, extendMap: Map[Int, Int]): Option[ClassModel] = {
@@ -65,7 +64,7 @@ object TSVReader {
 
   private def getMembers(lines: Map[Int, Array[String]]): List[IMemberModel] = {
     List()++lines.collect({
-      case l if l._2(0) == "ATTRIBUTE" =>
+      case l if l._2(0) == "ATTRIB" =>
         FieldModel(l._2(1), false,getModifiers(l._2).toArray, l._2(2))
       case l if l._2(0).indexOf("METHOD") != -1 =>
         MethodModel(l._2(1), false, getModifiers(l._2).toArray,
@@ -73,8 +72,8 @@ object TSVReader {
   }
 
   private def getParameters(lines: Map[Int, Array[String]], idx: Int): Map[String, String] = {
-    //val sLines = lines.toList.sortWith(_._1 < _._1)
-    val sLines = lines
+    val sLines = lines.toList.sortWith(_._1 < _._1)
+    //val sLines = lines
     if (((idx + 1) - sLines.find(l => l._1 > idx && l._2(0) != "PARAM").getOrElse((-1, -1))._1 - 1) >= 0)
       return Map()
     Map()++sLines.filter(a => (idx + 1) <= a._1 && (sLines.find(l => l._1 > idx && l._2(0) != "PARAM").get._1 - 1) >= a._1).
